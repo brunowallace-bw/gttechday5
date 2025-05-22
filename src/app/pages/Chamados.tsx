@@ -16,17 +16,16 @@ interface Chamado {
 
 interface ChamadosProps {
   isAdmin: boolean;
+  userEmail?: string;
 }
 
-export default function Chamados({ isAdmin }: ChamadosProps) {
+export default function Chamados({ isAdmin, userEmail }: ChamadosProps) {
   const router = useRouter();
   const [chamados, setChamados] = useState<Chamado[]>([]);
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [filtroPrioridade, setFiltroPrioridade] = useState<string>('todos');
 
-  // Simulação de dados - Substitua por sua API real
   useEffect(() => {
-    // Simulação de carregamento de chamados
     const carregarChamados = async () => {
       const chamadosMock: Chamado[] = [
         {
@@ -37,15 +36,31 @@ export default function Chamados({ isAdmin }: ChamadosProps) {
           prioridade: 'alta',
           cliente: 'Empresa ABC',
           dataAbertura: '2024-03-20',
-          usuario: 'joao@email.com'
+          usuario: 'cliente1@email.com'
+        },
+        {
+          id: 2,
+          titulo: 'Problema com Teclado',
+          descricao: 'Teclado não está funcionando',
+          status: 'aberto',
+          prioridade: 'media',
+          cliente: 'Empresa X - Cabrunco',
+          dataAbertura: '2024-03-20',
+          usuario: 'cliente2@email.com'
         },
         // Adicione mais chamados mock aqui
       ];
-      setChamados(chamadosMock);
+
+      // Filtra os chamados baseado no isAdmin e userEmail
+      const chamadosFiltrados = isAdmin 
+        ? chamadosMock 
+        : chamadosMock.filter(chamado => chamado.usuario === userEmail);
+
+      setChamados(chamadosFiltrados);
     };
 
     carregarChamados();
-  }, []);
+  }, [isAdmin, userEmail]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -128,38 +143,47 @@ export default function Chamados({ isAdmin }: ChamadosProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700">
+            <div className="col-span-3">Título</div>
+            <div className="col-span-2">Status</div>
+            <div className="col-span-2">Prioridade</div>
+            <div className="col-span-2">Cliente</div>
+            <div className="col-span-2">Data</div>
+            <div className="col-span-1 text-right">Ações</div>
+          </div>
+
           {chamadosFiltrados.map((chamado) => (
-            <div key={chamado.id} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">{chamado.titulo}</h3>
+            <div 
+              key={chamado.id} 
+              className="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <div className="col-span-3">
+                <div className="font-medium text-gray-900">{chamado.titulo}</div>
+                <div className="text-sm text-gray-500 truncate">{chamado.descricao}</div>
+              </div>
+              <div className="col-span-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(chamado.status)}`}>
                   {chamado.status.replace('_', ' ')}
                 </span>
               </div>
-              <p className="text-gray-600 mb-4">{chamado.descricao}</p>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Cliente:</span>
-                  <span className="text-gray-900">{chamado.cliente}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Data:</span>
-                  <span className="text-gray-900">{new Date(chamado.dataAbertura).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Prioridade:</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPrioridadeColor(chamado.prioridade)}`}>
-                    {chamado.prioridade}
-                  </span>
-                </div>
+              <div className="col-span-2">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPrioridadeColor(chamado.prioridade)}`}>
+                  {chamado.prioridade}
+                </span>
               </div>
-              <div className="mt-4 flex justify-end space-x-2">
+              <div className="col-span-2 text-sm text-gray-600">
+                {chamado.cliente}
+              </div>
+              <div className="col-span-2 text-sm text-gray-600">
+                {new Date(chamado.dataAbertura).toLocaleDateString()}
+              </div>
+              <div className="col-span-1 text-right">
                 <button
                   onClick={() => router.push(`/chamados/${chamado.id}`)}
                   className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                 >
-                  Ver detalhes
+                  Detalhes
                 </button>
               </div>
             </div>
