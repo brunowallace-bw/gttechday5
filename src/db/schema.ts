@@ -19,7 +19,7 @@ export const usuarios = pgTable('usuarios', {
 });
 
 // Enums para os cards
-export const categoriaEnum = pgEnum('categoria_chamado', ['Melhoria', 'Bug', 'Dúvida', 'Sugestão', 'Outros']);
+export const categoriaEnum = pgEnum('categoria_chamado', ['Melhoria', 'Correção', 'Dúvida', 'Sugestão', 'Outros']);
 export const prioridadeEnum = pgEnum('prioridade_chamado', ['Baixa', 'Média', 'Alta']);
 export const statusEnum = pgEnum('status_chamado', ['Aberto', 'Em Progresso', 'Concluído', 'Cancelado']);
 
