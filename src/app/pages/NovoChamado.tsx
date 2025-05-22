@@ -2,14 +2,31 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { db } from "@/db";
+import { chamados } from "@/db/schema";
+// import { insertTicket } from '@/db/insertTicket';
 
-export default function NovoChamado() {
+interface FormData {
+  titulo: string;
+  descricao: string;
+  categoria: 'melhoria' | 'duvida' | 'sugestao' | 'correcao' | 'outros';
+  prioridade: 'baixa' | 'media' | 'alta';
+  solicitanteId: number;
+}
+
+interface NovoChamadoProps {
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export default function NovoChamado({ onSuccess, onCancel }: NovoChamadoProps) {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     titulo: '',
     descricao: '',
+    categoria: 'melhoria',
     prioridade: 'media',
-    cliente: '',
+    solicitanteId: 0,
   });
   const [erro, setErro] = useState('');
 
@@ -25,38 +42,27 @@ export default function NovoChamado() {
     e.preventDefault();
     setErro('');
 
-    // Validação básica
-    if (!formData.titulo || !formData.descricao || !formData.cliente) {
+    if (!formData.titulo || !formData.descricao) {
       setErro('Por favor, preencha todos os campos obrigatórios');
       return;
     }
 
     try {
-      // Aqui você deve implementar a lógica para salvar o chamado
-      console.log('Novo chamado:', formData);
-      router.push('/chamados');
+      // await insertTicket(formData);
+      onSuccess?.();
     } catch (error) {
       setErro('Erro ao criar chamado. Tente novamente.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="bg-gray-100 p-4 h-[25rem]">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Novo Chamado</h1>
-            <button
-              onClick={() => router.push('/chamados')}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              Voltar
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-lg shadow p-8">
+          <form onSubmit={handleSubmit} className="space-y-3">
+                        {/* Título */}
             <div>
-              <label htmlFor="titulo" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 mb-1">
                 Título *
               </label>
               <input
@@ -65,45 +71,52 @@ export default function NovoChamado() {
                 name="titulo"
                 value={formData.titulo}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus:outline-none focus:border-blue-500"
                 placeholder="Digite o título do chamado"
               />
             </div>
 
-            <div>
-              <label htmlFor="cliente" className="block text-sm font-medium text-gray-700">
-                Cliente *
-              </label>
-              <input
-                type="text"
-                id="cliente"
-                name="cliente"
-                value={formData.cliente}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="Digite o nome do cliente"
-              />
+            {/* Categoria e Prioridade na mesma linha */}
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label htmlFor="categoria" className="block text-sm font-medium text-gray-700 mb-1">
+                  Categoria *
+                </label>
+                <select
+                  id="categoria"
+                  name="categoria"
+                  value={formData.categoria}
+                  onChange={handleChange}
+                  className="w-full rounded-[7px] border border-gray-300 px-3 py-0 text-base bg-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="melhoria">Melhoria</option>
+                  <option value="duvida">Dúvida</option>
+                  <option value="sugestao">Sugestão</option>
+                  <option value="correcao">Correção</option>
+                  <option value="outros">Outros</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <label htmlFor="prioridade" className="block text-sm font-medium text-gray-700 mb-1">
+                  Prioridade *
+                </label>
+                <select
+                  id="prioridade"
+                  name="prioridade"
+                  value={formData.prioridade}
+                  onChange={handleChange}
+                  className="w-full rounded-[7px] border border-gray-300 px-3 py-0 text-base bg-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="baixa">Baixa</option>
+                  <option value="media">Média</option>
+                  <option value="alta">Alta</option>
+                </select>
+              </div>
             </div>
 
+            {/* Descrição */}
             <div>
-              <label htmlFor="prioridade" className="block text-sm font-medium text-gray-700">
-                Prioridade
-              </label>
-              <select
-                id="prioridade"
-                name="prioridade"
-                value={formData.prioridade}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              >
-                <option value="baixa">Baixa</option>
-                <option value="media">Média</option>
-                <option value="alta">Alta</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="descricao" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="descricao" className="block text-sm font-medium text-gray-700 mb-1">
                 Descrição *
               </label>
               <textarea
@@ -111,31 +124,31 @@ export default function NovoChamado() {
                 name="descricao"
                 value={formData.descricao}
                 onChange={handleChange}
-                rows={4}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="Descreva o problema ou solicitação"
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus:outline-none focus:border-blue-500 resize-none"
+                placeholder="Descreva detalhadamente o chamado"
               />
             </div>
 
             {erro && (
-              <div className="text-red-500 text-sm">
+              <div className="text-red-500 text-xs">
                 {erro}
               </div>
             )}
 
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
-                onClick={() => router.push('/chamados')}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                onClick={onCancel}
+                className="px-5 py-1 rounded-lg text-base font-medium bg-red-500 text-white hover:bg-red-600 transition"
               >
-                Cancelar
+                Fechar
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                className="px-5 py-1 rounded-lg text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition"
               >
-                Criar Chamado
+                Salvar
               </button>
             </div>
           </form>
@@ -143,4 +156,4 @@ export default function NovoChamado() {
       </div>
     </div>
   );
-} 
+}
