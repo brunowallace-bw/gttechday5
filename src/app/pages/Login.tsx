@@ -52,11 +52,7 @@ export default function Home() {
 
       const user = await response.json();
       
-      if (user.isAdmin) {
-        router.push('/admin');
-      } else {
-        router.push('/client');
-      }
+      router.push(`/chamados?is_admin=${user.isAdmin}`);
     } catch (error) {
       setErro('Usuário ou senha inválidos');
     }

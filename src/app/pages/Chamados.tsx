@@ -14,21 +14,18 @@ interface Chamado {
   usuario: string;
 }
 
-export default function Chamados() {
+interface ChamadosProps {
+  isAdmin: boolean;
+}
+
+export default function Chamados({ isAdmin }: ChamadosProps) {
   const router = useRouter();
   const [chamados, setChamados] = useState<Chamado[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [filtroPrioridade, setFiltroPrioridade] = useState<string>('todos');
 
   // Simulação de dados - Substitua por sua API real
   useEffect(() => {
-    // Simulação de verificação de admin
-    const checkAdmin = async () => {
-      // Aqui você deve implementar a verificação real do usuário
-      setIsAdmin(true); // Temporário para teste
-    };
-
     // Simulação de carregamento de chamados
     const carregarChamados = async () => {
       const chamadosMock: Chamado[] = [
@@ -47,7 +44,6 @@ export default function Chamados() {
       setChamados(chamadosMock);
     };
 
-    checkAdmin();
     carregarChamados();
   }, []);
 
