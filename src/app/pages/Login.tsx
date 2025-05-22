@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { validateUserLogin, type LoginForm } from "@/db/validateUserLogin";
 
 export default function Home() {
   const router = useRouter();
@@ -23,7 +24,6 @@ export default function Home() {
     e.preventDefault();
     setErro('');
 
-    // Validação básica
     if (!formData.email || !formData.senha) {
       setErro('Por favor, preencha todos os campos');
       return;
@@ -34,26 +34,44 @@ export default function Home() {
       return;
     }
 
-    // Aqui você pode adicionar a lógica de autenticação
     try {
-      // Simulação de login
-      console.log('Tentando login com:', formData);
-      // router.push('/dashboard'); // Descomente quando tiver a rota de dashboard
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.senha
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha na autenticação');
+      }
+
+      const user = await response.json();
+      
+      if (user.isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/client');
+      }
     } catch (error) {
-      setErro('Erro ao fazer login. Tente novamente.');
+      setErro('Usuário ou senha inválidos');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-sm w-full space-y-6 bg-white p-8 rounded-lg shadow-md border border-gray-200">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Faça login na sua conta
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-[#00A1d4]">
+            Login
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-3">
             <div>
               <label htmlFor="email" className="sr-only">
                 Email
@@ -63,8 +81,8 @@ export default function Home() {
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-[5px] focus:outline-none focus:ring-[#00A1d4] focus:border-[#00A1d4] focus:z-10 sm:text-sm"
+                placeholder="email@example.com"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -78,8 +96,8 @@ export default function Home() {
                 name="senha"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Senha"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-[5px] focus:outline-none focus:ring-[#00A1d4] focus:border-[#00A1d4] focus:z-10 sm:text-sm"
+                placeholder="••••••••"
                 value={formData.senha}
                 onChange={handleChange}
               />
@@ -94,7 +112,7 @@ export default function Home() {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <a href="#" className="font-medium text-[#00A1d4] hover:text-[#0088b3]">
                 Esqueceu sua senha?
               </a>
             </div>
@@ -103,7 +121,7 @@ export default function Home() {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#00A1d4] hover:bg-[#0088b3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00A1d4]"
             >
               Entrar
             </button>
