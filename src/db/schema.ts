@@ -28,8 +28,8 @@ export const chamados = pgTable('chamados', {
   id: serial('id').primaryKey(),
   titulo: varchar('titulo', { length: 255 }).notNull(),
   descricao: text('descricao').notNull(),
-  categoria: categoriaEnum('categoria').notNull(),
-  prioridade: prioridadeEnum('prioridade').notNull(),
+  categoria: categoriaEnum('categoria'),
+  prioridade: prioridadeEnum('prioridade'),
   status: statusEnum('status').default('Aberto').notNull(),
   
   // Relacionamentos com usuários
