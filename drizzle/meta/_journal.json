@@ -22,6 +22,13 @@
       "when": 1747922152461,
       "tag": "0002_cheerful_puma",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1747925093553,
+      "tag": "0003_greedy_franklin_richards",
+      "breakpoints": true
     }
   ]
 }
