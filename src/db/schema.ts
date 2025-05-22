@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, varchar, boolean, pgEnum, integer } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, varchar, boolean, pgEnum, integer, date } from 'drizzle-orm/pg-core';
 
 // Tabela de teste
 export const teste = pgTable('teste', {
@@ -39,5 +39,21 @@ export const chamados = pgTable('chamados', {
   // Datas
   dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
   dataResposta: timestamp('data_resposta'),
+  dataAtualizacao: timestamp('data_atualizacao').defaultNow().notNull(),
+});
+
+// Tabela de tasks
+export const tasks = pgTable('tasks', {
+  id: serial('id').primaryKey(),
+  titulo: varchar('titulo', { length: 255 }).notNull(),
+  descricao: text('descricao').notNull(),
+  prioridade: prioridadeEnum('prioridade').notNull(),
+  prazo: date('prazo').notNull(),
+  
+  // Relacionamento com o admin que criou a task
+  criadorId: integer('criador_id').references(() => usuarios.id).notNull(),
+  
+  // Datas
+  dataCriacao: timestamp('data_criacao').defaultNow().notNull(),
   dataAtualizacao: timestamp('data_atualizacao').defaultNow().notNull(),
 });
